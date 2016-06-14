@@ -1,5 +1,6 @@
-package ca.erik.bs.dao;
+package ca.erik.bs.dao.impl;
 
+import ca.erik.bs.dao.ApartmentDao;
 import ca.erik.bs.model.Apartment;
 
 import java.sql.Connection;
