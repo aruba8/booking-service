@@ -1,5 +1,8 @@
 package ca.erik.bs.dao;
 
+import ca.erik.bs.dao.impl.*;
+import ca.erik.bs.utils.PropertiesManager;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -9,10 +12,11 @@ import java.sql.SQLException;
  */
 public class PostgresDaoFactory implements DaoFactory {
 
-    private String user = "bs";
-    private String password = "bs";
-    private String url = "jdbc:postgresql://localhost:5432/bs";
-    private String driver = "org.postgresql.Driver";
+    PropertiesManager propertiesManager = new PropertiesManager();
+    private String user = PropertiesManager.properties.getProperty("db.user");
+    private String password = PropertiesManager.properties.getProperty("db.password");;
+    private String url = PropertiesManager.properties.getProperty("db.url");
+    private String driver = PropertiesManager.properties.getProperty("db.driver");
 
     public PostgresDaoFactory(){
         try{

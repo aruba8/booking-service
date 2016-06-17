@@ -1,18 +1,20 @@
 package ca.erik.bs.model;
 
+import java.io.Serializable;
 import java.sql.Timestamp;
+import java.util.Date;
 
 /**
  * @author Erik Khalimov.
  */
-public class Transaction {
+public class Transaction implements Serializable {
 
     private int id;
     private double sum;
     private int tenantId;
     private int apartmentId;
     private int bookingPeriodId;
-    private Timestamp transactionTime;
+    private Date transactionTime;
 
     public int getId() {
         return id;
@@ -54,7 +56,7 @@ public class Transaction {
         this.bookingPeriodId = bookingPeriodId;
     }
 
-    public Timestamp getTransactionTime() {
+    public Date getTransactionTime() {
         return transactionTime;
     }
 

@@ -1,12 +1,13 @@
 package ca.erik.bs.model;
 
 
+import java.io.Serializable;
 import java.sql.Date;
 
 /**
  * @author Erik Khalimov.
  */
-public class BookingPeriod {
+public class BookingPeriod implements Serializable {
 
     private int id;
     private Date fromDate;

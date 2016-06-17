@@ -1,9 +1,11 @@
 package ca.erik.bs.model;
 
+import java.io.Serializable;
+
 /**
  * @author Erik Khalimov.
  */
-public class Tenant {
+public class Tenant implements Serializable {
 
     private int id;
     private String firstName;

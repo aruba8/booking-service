@@ -1,9 +1,11 @@
 package ca.erik.bs.model;
 
+import java.io.Serializable;
+
 /**
  * @author Erik Khalimov.
  */
-public class Apartment {
+public class Apartment implements Serializable{
 
     private int id;
     private double price;
