@@ -1,7 +1,6 @@
 package ca.erik.bs.model;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
 import java.util.Date;
 
 /**
@@ -60,7 +59,7 @@ public class Transaction implements Serializable {
         return transactionTime;
     }
 
-    public void setTransactionTime(Timestamp transactionTime) {
+    public void setTransactionTime(Date transactionTime) {
         this.transactionTime = transactionTime;
     }
 }

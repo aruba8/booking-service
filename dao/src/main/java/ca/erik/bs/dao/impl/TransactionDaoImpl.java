@@ -3,10 +3,7 @@ package ca.erik.bs.dao.impl;
 import ca.erik.bs.dao.TransactionDao;
 import ca.erik.bs.model.Transaction;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 
 /**
  * @author Erik Khalimov.
@@ -27,7 +24,7 @@ public class TransactionDaoImpl implements TransactionDao {
             pstm.setInt(2, transaction.getApartmentId());
             pstm.setInt(3, transaction.getTenantId());
             pstm.setInt(4, transaction.getBookingPeriodId());
-            pstm.setTimestamp(5, transaction.getTransactionTime());
+            pstm.setDate(5, new Date(transaction.getTransactionTime().getTime()));
             pstm.execute();
 
         } catch (SQLException e) {
@@ -63,7 +60,7 @@ public class TransactionDaoImpl implements TransactionDao {
             pstm.setInt(2, transaction.getApartmentId());
             pstm.setInt(3, transaction.getTenantId());
             pstm.setInt(4, transaction.getBookingPeriodId());
-            pstm.setTimestamp(5, transaction.getTransactionTime());
+            pstm.setDate(5, new Date(transaction.getTransactionTime().getTime()));
             pstm.setInt(6, transaction.getId());
         } catch (SQLException e) {
             e.printStackTrace();

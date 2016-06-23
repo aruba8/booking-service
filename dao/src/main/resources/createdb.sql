@@ -28,7 +28,7 @@ CREATE TABLE "transaction" (
   "apartment_id"      BIGINT         NOT NULL,
   "tenant_id"         BIGINT         NOT NULL,
   "booking_period_id" BIGINT         NOT NULL,
-  "transaction_time"  TIMESTAMP      NOT NULL,
+  "transaction_time"  DATE      NOT NULL,
   CONSTRAINT transaction_pk PRIMARY KEY ("id")
 ) WITH (
 OIDS =FALSE
