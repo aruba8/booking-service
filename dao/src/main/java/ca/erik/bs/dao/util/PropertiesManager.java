@@ -1,4 +1,4 @@
-package ca.erik.bs.utils;
+package ca.erik.bs.dao.util;
 
 import java.io.FileInputStream;
 import java.io.IOException;

@@ -1,7 +1,7 @@
 package ca.erik.bs.dao;
 
 import ca.erik.bs.dao.impl.*;
-import ca.erik.bs.utils.PropertiesManager;
+import ca.erik.bs.dao.util.PropertiesManager;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
