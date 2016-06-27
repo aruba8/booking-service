@@ -15,4 +15,7 @@ public interface TenantDao {
 
     void delete(Tenant tenant);
 
+    void deleteAll();
+
+    Tenant findByEmail(String email);
 }

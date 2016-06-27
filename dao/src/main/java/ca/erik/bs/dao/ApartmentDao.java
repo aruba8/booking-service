@@ -13,9 +13,13 @@ public interface ApartmentDao {
 
     Apartment get(int key);
 
+    List<Apartment> findByLandlordId(int landlordId);
+
     void update(Apartment apartment);
 
     void delete(Apartment apartment);
+
+    void deleteAll();
 
     List<Apartment> getAll();
 

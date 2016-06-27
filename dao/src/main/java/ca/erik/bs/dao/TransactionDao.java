@@ -2,6 +2,8 @@ package ca.erik.bs.dao;
 
 import ca.erik.bs.model.Transaction;
 
+import java.util.List;
+
 /**
  * @author Erik Khalimov.
  */
@@ -15,4 +17,7 @@ public interface TransactionDao {
 
     void delete(Transaction transaction);
 
+    void deleteAll();
+
+    List<Transaction> findByTenantId(int tenantId);
 }

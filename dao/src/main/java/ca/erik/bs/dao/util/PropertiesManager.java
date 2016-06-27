@@ -9,12 +9,12 @@ import java.util.Properties;
  */
 public class PropertiesManager {
 
-    public static Properties properties = new Properties();
+    public Properties properties = new Properties();
 
-    static {
+    public PropertiesManager() {
+        String CONFIG_FILE_NAME = "config.properties";
         try {
 
-            String CONFIG_FILE_NAME = "config.properties";
             properties.load(new FileInputStream(CONFIG_FILE_NAME));
 
         } catch (IOException e) {
@@ -22,7 +22,12 @@ public class PropertiesManager {
         }
     }
 
-
-
+    public PropertiesManager(String propertiesFileName) {
+        try {
+            properties.load(new FileInputStream(propertiesFileName));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 }

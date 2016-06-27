@@ -12,18 +12,38 @@ import java.sql.SQLException;
  */
 public class PostgresDaoFactory implements DaoFactory {
 
-    PropertiesManager propertiesManager = new PropertiesManager();
-    private String user = PropertiesManager.properties.getProperty("db.user");
-    private String password = PropertiesManager.properties.getProperty("db.password");;
-    private String url = PropertiesManager.properties.getProperty("db.url");
-    private String driver = PropertiesManager.properties.getProperty("db.driver");
+    private PropertiesManager propertiesManager;
 
-    public PostgresDaoFactory(){
-        try{
-            Class.forName(driver);
+    private String user;
+    private String password;
+    private String url;
+    private String driver;
+
+    public PostgresDaoFactory() {
+        this.propertiesManager = new PropertiesManager();
+        try {
+            initProperties();
+            Class.forName(this.driver);
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public PostgresDaoFactory(PropertiesManager propertiesManager) {
+        this.propertiesManager = propertiesManager;
+        try {
+            initProperties();
+            Class.forName(this.driver);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initProperties() {
+        this.user = propertiesManager.properties.getProperty("db.user");
+        this.password = propertiesManager.properties.getProperty("db.password");
+        this.url = propertiesManager.properties.getProperty("db.url");
+        this.driver = propertiesManager.properties.getProperty("db.driver");
     }
 
 
