@@ -7,21 +7,29 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Erik Khalimov.
- */
-public class TransactionDaoImpl implements TransactionDao {
+public class TransactionDaoImpl extends BaseDao implements TransactionDao {
 
-    private final Connection connection;
+
+    private final String SAVE_QUERY = "INSERT INTO transaction (sum, apartment_id, tenant_id, booking_period_id, transaction_time) VALUES (?, ?, ?, ?, ?);";
+
+    private final String GET_QUERY = "SELECT * FROM transaction WHERE id = ?;";
+
+    private final String UPDATE_QUERY = "UPDATE transaction SET sum=?, apartment_id=?, tenant_id=?, booking_period_id=?, transaction_time=? WHERE id=?;";
+
+    private final String DELETE_ALL_QUERY = "DELETE FROM transaction;";
+
+    private final String FIND_BY_TENANT_ID_QUERY = "SELECT * FROM transaction WHERE tenant_id = ?;";
+
+    private final String DELETE_QUERY = "DELETE FROM transaction WHERE id = ?;";
 
     public TransactionDaoImpl(Connection connection) {
-        this.connection = connection;
+        super(connection);
     }
 
     public void save(Transaction transaction) {
-        String sql = "INSERT INTO transaction (sum, apartment_id, tenant_id, booking_period_id, transaction_time) VALUES (?, ?, ?, ?, ?);";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(SAVE_QUERY);
             pstm.setDouble(1, transaction.getSum());
             pstm.setInt(2, transaction.getApartmentId());
             pstm.setInt(3, transaction.getTenantId());
@@ -31,16 +39,19 @@ public class TransactionDaoImpl implements TransactionDao {
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public Transaction get(int key) {
-        String sql = "SELECT * FROM transaction WHERE id = ?;";
         Transaction transaction = new Transaction();
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(GET_QUERY);
             pstm.setInt(1, key);
-            ResultSet rs = pstm.executeQuery();
+            rs = pstm.executeQuery();
             rs.next();
             transaction.setId(key);
             transaction.setSum(rs.getDouble("sum"));
@@ -50,14 +61,16 @@ public class TransactionDaoImpl implements TransactionDao {
             transaction.setTransactionTime(rs.getTimestamp("transaction_time"));
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return transaction;
     }
 
     public void update(Transaction transaction) {
-        String sql = "UPDATE transaction SET sum=?, apartment_id=?, tenant_id=?, booking_period_id=?, transaction_time=? WHERE id=?;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(UPDATE_QUERY);
             pstm.setDouble(1, transaction.getSum());
             pstm.setInt(2, transaction.getApartmentId());
             pstm.setInt(3, transaction.getTenantId());
@@ -67,38 +80,45 @@ public class TransactionDaoImpl implements TransactionDao {
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public void delete(Transaction transaction) {
-        String sqlq = "DELETE FROM transaction WHERE id = ?;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sqlq);
+            pstm = this.connection.prepareStatement(DELETE_QUERY);
             pstm.setInt(1, transaction.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public void deleteAll() {
-        String sqlq = "DELETE FROM transaction;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sqlq);
+            pstm = this.connection.prepareStatement(DELETE_ALL_QUERY);
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public List<Transaction> findByTenantId(int tenantId) {
-        String sql = "SELECT * FROM transaction WHERE tenant_id = ?;";
         Transaction transaction = new Transaction();
         List<Transaction> transactionList = new ArrayList<Transaction>();
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(FIND_BY_TENANT_ID_QUERY);
             pstm.setInt(1, tenantId);
-            ResultSet rs = pstm.executeQuery();
+            rs = pstm.executeQuery();
             while (rs.next()) {
                 transaction.setId(rs.getInt("id"));
                 transaction.setSum(rs.getDouble("sum"));
@@ -110,6 +130,8 @@ public class TransactionDaoImpl implements TransactionDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return transactionList;
     }

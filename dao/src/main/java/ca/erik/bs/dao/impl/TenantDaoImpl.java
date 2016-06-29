@@ -8,44 +8,53 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * @author Erik Khalimov.
- */
-public class TenantDaoImpl implements TenantDao {
+public class TenantDaoImpl extends BaseDao implements TenantDao {
 
-    private final Connection connection;
+    private final String SAVE_QUERY = "INSERT INTO tenant (first_name, last_name, middle_name, phone_number, email) VALUES (?, ?, ?, ?, ?);";
+
+    private final String UPDATE_QUERY = "UPDATE tenant SET first_name=?, middle_name=?, last_name=?, phone_number=?, email=? WHERE id=?;";
+
+    private final String DELETE_QUERY = "DELETE FROM tenant WHERE id=?;";
+
+    private final String DELETE_ALL_QUERY = "DELETE FROM tenant;";
+
+    private final String FIND_BY_EMAIL_QUERY = "SELECT * FROM tenant WHERE email = ?;";
+
+    private final String GET_QUERY = "SELECT * FROM tenant WHERE id = ?;";
 
     public TenantDaoImpl(Connection connection) {
-        this.connection = connection;
+        super(connection);
     }
 
     public Tenant get(int key) {
-        String sql = "SELECT * FROM tenant WHERE id = ?;";
         Tenant tenant = new Tenant();
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(GET_QUERY);
             pstm.setInt(1, key);
-            ResultSet rs = pstm.executeQuery();
+            rs = pstm.executeQuery();
             if (!rs.next()) {
                 return null;
             }
             tenant.setId(rs.getInt("id"));
             tenant.setFirstName(rs.getString("first_name"));
-            tenant.setLastName(rs.getString("last_name"));
             tenant.setMiddleName(rs.getString("middle_name"));
+            tenant.setLastName(rs.getString("last_name"));
             tenant.setPhoneNumber(rs.getString("phone_number"));
             tenant.setEmail(rs.getString("email"));
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return tenant;
     }
 
     public void save(Tenant tenant) {
-        String sql = "INSERT INTO tenant (first_name, last_name, middle_name, phone_number, email) VALUES (?, ?, ?, ?, ?);";
-        PreparedStatement pstm;
+        PreparedStatement pstm = null;
         try {
-            pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(SAVE_QUERY);
             pstm.setString(1, tenant.getFirstName());
             pstm.setString(2, tenant.getLastName());
             pstm.setString(3, tenant.getMiddleName());
@@ -54,14 +63,15 @@ public class TenantDaoImpl implements TenantDao {
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public void update(Tenant tenant) {
-        String sql = "UPDATE tenant SET first_name=?, middle_name=?, last_name=?, phone_number=?, email=? WHERE id=?;";
-        PreparedStatement pstm;
+        PreparedStatement pstm = null;
         try {
-            pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(UPDATE_QUERY);
             pstm.setString(1, tenant.getFirstName());
             pstm.setString(2, tenant.getMiddleName());
             pstm.setString(3, tenant.getLastName());
@@ -71,41 +81,48 @@ public class TenantDaoImpl implements TenantDao {
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
 
     }
 
     public void delete(Tenant tenant) {
-        String sql = "DELETE FROM tenant WHERE id=?;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm = connection.prepareStatement(DELETE_QUERY);
             pstm.setInt(1, tenant.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
 
 
     }
 
     public void deleteAll() {
-        String sql = "DELETE FROM tenant;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm = connection.prepareStatement(DELETE_ALL_QUERY);
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
 
     }
 
     public Tenant findByEmail(String email) {
-        String sql = "SELECT * FROM tenant WHERE email = ?;";
         Tenant tenant = new Tenant();
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(FIND_BY_EMAIL_QUERY);
             pstm.setString(1, email);
-            ResultSet rs = pstm.executeQuery();
+            rs = pstm.executeQuery();
             if (!rs.next()) {
                 return null;
             }
@@ -117,6 +134,8 @@ public class TenantDaoImpl implements TenantDao {
             tenant.setEmail(rs.getString("email"));
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return tenant;
     }

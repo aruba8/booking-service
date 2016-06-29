@@ -10,25 +10,34 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Erik Khalimov.
- */
-public class LandlordDaoImpl implements LandlordDao {
+public class LandlordDaoImpl extends BaseDao implements LandlordDao {
 
-    private final Connection connection;
+    private final String GET_QUERY = "SELECT * FROM landlord WHERE id = ?;";
+
+    private final String SAVE_QUERY = "INSERT INTO landlord (first_name, middle_name, last_name, phone_number, email) VALUES (?, ?, ?, ?, ?);";
+
+    private final String UPDATE_QUERY = "UPDATE landlord SET first_name=?, middle_name=?, last_name=?, phone_number=?, email=? WHERE id=?;";
+
+    private final String DELETE_QUERY = "DELETE FROM landlord WHERE id=?;";
+
+    private final String DELETE_ALL_QUERY = "DELETE FROM landlord;";
+
+    private final String FIND_ALL_QUERY = "SELECT * FROM landlord;";
+
+    private final String FIND_LANDLORD_BY_EMAIL_QUERY = "SELECT * FROM landlord WHERE email=?;";
 
     public LandlordDaoImpl(Connection connection) {
-        this.connection = connection;
+        super(connection);
     }
 
     public Landlord get(int key) {
-        String sql = "SELECT * FROM landlord WHERE id = ?;";
-        PreparedStatement pstm;
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         Landlord landlord = new Landlord();
         try {
-            pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(GET_QUERY);
             pstm.setInt(1, key);
-            ResultSet rs = pstm.executeQuery();
+            rs = pstm.executeQuery();
             if (!rs.next()) {
                 return null;
             }
@@ -40,18 +49,20 @@ public class LandlordDaoImpl implements LandlordDao {
             landlord.setEmail(rs.getString("email"));
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return landlord;
     }
 
     public Landlord findLandlordByEmail(String email) {
-        String sql = "SELECT * FROM landlord WHERE email=?;";
-        PreparedStatement pstm;
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         Landlord landlord = new Landlord();
         try {
-            pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(FIND_LANDLORD_BY_EMAIL_QUERY);
             pstm.setString(1, email);
-            ResultSet rs = pstm.executeQuery();
+            rs = pstm.executeQuery();
             rs.next();
             landlord.setId(rs.getInt("id"));
             landlord.setFirstName(rs.getString("first_name"));
@@ -61,14 +72,16 @@ public class LandlordDaoImpl implements LandlordDao {
             landlord.setEmail(rs.getString("email"));
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return landlord;
     }
 
     public void save(Landlord landLord) {
-        String sql = "INSERT INTO landlord (first_name, middle_name, last_name, phone_number, email) VALUES (?, ?, ?, ?, ?);";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(SAVE_QUERY);
             pstm.setString(1, landLord.getFirstName());
             pstm.setString(2, landLord.getMiddleName());
             pstm.setString(3, landLord.getLastName());
@@ -77,53 +90,61 @@ public class LandlordDaoImpl implements LandlordDao {
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public void update(Landlord landLord) {
-        String sql = "UPDATE landlord SET first_name=?, middle_name=?, last_name=?, phone_number=?, email=? WHERE id=?;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(UPDATE_QUERY);
             pstm.setString(1, landLord.getFirstName());
             pstm.setString(2, landLord.getMiddleName());
-            pstm.setString(3, landLord.getLastName());
             pstm.setString(4, landLord.getPhoneNumber());
+            pstm.setString(3, landLord.getLastName());
             pstm.setString(5, landLord.getEmail());
             pstm.setInt(6, landLord.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public void delete(Landlord landLord) {
-        String sql = "DELETE FROM landlord WHERE id=?;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(DELETE_QUERY);
             pstm.setInt(1, landLord.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public void deleteAll() {
-        String sql = "DELETE FROM landlord;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm = connection.prepareStatement(DELETE_ALL_QUERY);
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public List<Landlord> findAll() {
-        String sql = "SELECT * FROM landlord;";
-        PreparedStatement pstm;
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         List<Landlord> landlordList = new ArrayList<Landlord>();
         try {
-            pstm = this.connection.prepareStatement(sql);
-            ResultSet rs = pstm.executeQuery();
+            pstm = this.connection.prepareStatement(FIND_ALL_QUERY);
+            rs = pstm.executeQuery();
             while (rs.next()) {
                 Landlord landlord = new Landlord();
                 landlord.setId(rs.getInt("id"));
@@ -136,6 +157,8 @@ public class LandlordDaoImpl implements LandlordDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return landlordList;
     }

@@ -10,38 +10,51 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Erik Khalimov.
- */
-public class ApartmentDaoImpl implements ApartmentDao {
+public class ApartmentDaoImpl extends BaseDao implements ApartmentDao {
 
-    private final Connection connection;
+    private final String SAVE_QUERY = "INSERT INTO apartment (address, price, landlord_id)  VALUES (?, ?, ?);";
+
+    private final String GET_QUERY = "SELECT * FROM apartment WHERE id=?;";
+
+    private final String FIND_BY_LANDLORD_ID_QUERY = "SELECT * FROM apartment WHERE landlord_id=?;";
+
+    private final String UPDATE_QUERY = "UPDATE apartment SET address=?, price=?, landlord_id=? WHERE id=?;";
+
+    private final String DELETE_QUERY = "DELETE FROM apartment WHERE id=?;";
+
+    private final String GET_ALL_QUERY = "SELECT * FROM apartment;";
+
+    private final String DELETE_ALL_QUERY = "DELETE FROM apartment;";
+
 
     public ApartmentDaoImpl(Connection connection) {
-        this.connection = connection;
+        super(connection);
     }
 
     public void save(Apartment apartment) {
-        String sql = "INSERT INTO apartment (address, price, landlord_id)  VALUES (?, ?, ?);";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm = connection.prepareStatement(SAVE_QUERY);
             pstm.setString(1, apartment.getAddress());
             pstm.setDouble(2, apartment.getPrice());
             pstm.setInt(3, apartment.getLandlordId());
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
 
     }
 
     public Apartment get(int key) {
-        String sql = "SELECT * FROM apartment WHERE id=?;";
         Apartment apartment = new Apartment();
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm = connection.prepareStatement(GET_QUERY);
             pstm.setInt(1, key);
-            ResultSet rs = pstm.executeQuery();
+            rs = pstm.executeQuery();
             while (rs.next()) {
                 apartment.setId(rs.getInt("id"));
                 apartment.setAddress(rs.getString("address"));
@@ -51,17 +64,20 @@ public class ApartmentDaoImpl implements ApartmentDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return apartment;
     }
 
     public List<Apartment> findByLandlordId(int landlordId) {
-        String sql = "SELECT * FROM apartment WHERE landlord_id=?;";
         List<Apartment> apartmentList = new ArrayList<Apartment>();
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm = connection.prepareStatement(FIND_BY_LANDLORD_ID_QUERY);
             pstm.setInt(1, landlordId);
-            ResultSet rs = pstm.executeQuery();
+            rs = pstm.executeQuery();
             while (rs.next()) {
                 Apartment apartment = new Apartment();
                 apartment.setAddress(rs.getString("address"));
@@ -72,14 +88,17 @@ public class ApartmentDaoImpl implements ApartmentDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return apartmentList;
     }
 
+
     public void update(Apartment apartment) {
-        String sql = "UPDATE apartment SET address=?, price=?, landlord_id=? WHERE id=?;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm = connection.prepareStatement(UPDATE_QUERY);
             pstm.setString(1, apartment.getAddress());
             pstm.setDouble(2, apartment.getPrice());
             pstm.setInt(3, apartment.getLandlordId());
@@ -87,36 +106,43 @@ public class ApartmentDaoImpl implements ApartmentDao {
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public void delete(Apartment apartment) {
-        String sql = "DELETE FROM apartment WHERE id=?;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm = connection.prepareStatement(DELETE_QUERY);
             pstm.setInt(1, apartment.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public void deleteAll() {
-        String sql = "DELETE FROM apartment;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm = connection.prepareStatement(DELETE_ALL_QUERY);
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public List<Apartment> getAll() {
-        String sql = "SELECT * FROM apartment;";
         List<Apartment> apartmentList = new ArrayList<Apartment>();
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
-            ResultSet rs = pstm.executeQuery();
+            pstm = connection.prepareStatement(GET_ALL_QUERY);
+            rs = pstm.executeQuery();
             while (rs.next()) {
                 Apartment apartment = new Apartment();
                 apartment.setId(rs.getInt("id"));
@@ -127,8 +153,11 @@ public class ApartmentDaoImpl implements ApartmentDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return apartmentList;
 
     }
+
 }

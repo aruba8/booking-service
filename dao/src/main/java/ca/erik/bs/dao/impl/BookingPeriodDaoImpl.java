@@ -10,34 +10,39 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author Erik Khalimov.
- */
-public class BookingPeriodDaoImpl implements BookingPeriodDao {
+public class BookingPeriodDaoImpl extends BaseDao implements BookingPeriodDao {
 
-    private final Connection connection;
+    private final String UPDATE_QUERY = "UPDATE booking_period SET from_date=?, to_date=?, apartment_id=? WHERE id=?;";
+
+    private final String FIND_BY_APARTMENT_ID_QUERY = "SELECT * FROM booking_period WHERE apartment_id=?;";
+
+    private final String DELETE_ALL_QUERY = "DELETE FROM booking_period;";
+
+    private final String SAVE_QUERY = "INSERT INTO booking_period (from_date, to_date, apartment_id) VALUES (?,?,?);";
 
     public BookingPeriodDaoImpl(Connection connection) {
-        this.connection = connection;
+        super(connection);
     }
 
     public void save(BookingPeriod bookingPeriod) {
-        String sql = "INSERT INTO booking_period (from_date, to_date, apartment_id) VALUES (?,?,?);";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(SAVE_QUERY);
             pstm.setDate(1, bookingPeriod.getFromDate());
             pstm.setInt(3, bookingPeriod.getApartment_id());
             pstm.setDate(2, bookingPeriod.getToDate());
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public void update(BookingPeriod bookingPeriod) {
-        String sql = "UPDATE booking_period SET from_date=?, to_date=?, apartment_id=? WHERE id=?;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(UPDATE_QUERY);
             pstm.setDate(2, bookingPeriod.getToDate());
             pstm.setDate(1, bookingPeriod.getFromDate());
             pstm.setInt(3, bookingPeriod.getApartment_id());
@@ -45,16 +50,19 @@ public class BookingPeriodDaoImpl implements BookingPeriodDao {
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 
     public List<BookingPeriod> findByApartmentId(int apartmentId) {
-        String sql = "SELECT * FROM booking_period WHERE apartment_id=?;";
         List<BookingPeriod> bookingPeriodList = new ArrayList<BookingPeriod>();
+        PreparedStatement pstm = null;
+        ResultSet rs = null;
         try {
-            PreparedStatement pstm = connection.prepareStatement(sql);
+            pstm = connection.prepareStatement(FIND_BY_APARTMENT_ID_QUERY);
             pstm.setInt(1, apartmentId);
-            ResultSet rs = pstm.executeQuery();
+            rs = pstm.executeQuery();
             while (rs.next()) {
                 BookingPeriod bookingPeriod = new BookingPeriod();
                 bookingPeriod.setApartment_id(rs.getInt("apartment_id"));
@@ -65,18 +73,22 @@ public class BookingPeriodDaoImpl implements BookingPeriodDao {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(rs, pstm);
         }
         return bookingPeriodList;
 
     }
 
     public void deleteAll() {
-        String sql = "DELETE FROM booking_period;";
+        PreparedStatement pstm = null;
         try {
-            PreparedStatement pstm = this.connection.prepareStatement(sql);
+            pstm = this.connection.prepareStatement(DELETE_ALL_QUERY);
             pstm.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            closeResources(null, pstm);
         }
     }
 }
