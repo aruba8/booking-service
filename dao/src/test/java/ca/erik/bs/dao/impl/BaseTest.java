@@ -11,9 +11,6 @@ import java.io.IOException;
 import java.sql.Connection;
 import java.sql.Statement;
 
-/**
- * @author Erik Khalimov.
- */
 public class BaseTest {
     @BeforeClass
     public static void setUpDb() throws Exception {

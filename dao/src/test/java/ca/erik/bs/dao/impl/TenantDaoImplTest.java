@@ -11,9 +11,6 @@ import org.junit.Test;
 
 import java.sql.Connection;
 
-/**
- * @author Erik Khalimov.
- */
 public class TenantDaoImplTest extends BaseTest {
 
     private Connection connection;

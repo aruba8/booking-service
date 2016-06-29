@@ -17,9 +17,6 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 
-/**
- * @author Erik Khalimov.
- */
 public class BookingPeriodDaoImplTest extends BaseTest {
 
     private Connection connection;

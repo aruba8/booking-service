@@ -12,9 +12,6 @@ import org.junit.Test;
 import java.sql.Connection;
 import java.util.List;
 
-/**
- * @author Erik Khalimov.
- */
 public class LandlordDaoImplTest extends BaseTest {
 
     private Connection connection;

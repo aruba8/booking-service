@@ -2,9 +2,6 @@ package ca.erik.bs.dao;
 
 import ca.erik.bs.model.Tenant;
 
-/**
- * @author Erik Khalimov.
- */
 public interface TenantDao {
 
     Tenant get(int key);

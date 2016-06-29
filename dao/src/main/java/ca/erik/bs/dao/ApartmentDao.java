@@ -4,9 +4,6 @@ import ca.erik.bs.model.Apartment;
 
 import java.util.List;
 
-/**
- * @author Erik Khalimov.
- */
 public interface ApartmentDao {
 
     void save(Apartment apartment);

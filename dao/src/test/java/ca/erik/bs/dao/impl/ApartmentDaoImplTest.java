@@ -15,9 +15,6 @@ import java.sql.Connection;
 import java.util.List;
 
 
-/**
- * @author Erik Khalimov.
- */
 public class ApartmentDaoImplTest extends BaseTest {
 
 

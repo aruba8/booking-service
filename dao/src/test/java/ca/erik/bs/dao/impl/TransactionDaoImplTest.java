@@ -13,9 +13,6 @@ import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-/**
- * @author Erik Khalimov.
- */
 public class TransactionDaoImplTest extends BaseTest {
 
     private Connection connection;

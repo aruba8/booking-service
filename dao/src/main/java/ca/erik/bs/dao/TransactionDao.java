@@ -4,9 +4,6 @@ import ca.erik.bs.model.Transaction;
 
 import java.util.List;
 
-/**
- * @author Erik Khalimov.
- */
 public interface TransactionDao {
 
     void save(Transaction transaction);

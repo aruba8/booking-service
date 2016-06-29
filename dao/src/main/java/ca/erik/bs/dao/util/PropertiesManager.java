@@ -4,9 +4,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
 
-/**
- * @author Erik Khalimov.
- */
 public class PropertiesManager {
 
     public Properties properties = new Properties();

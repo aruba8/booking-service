@@ -4,9 +4,6 @@ import ca.erik.bs.model.BookingPeriod;
 
 import java.util.List;
 
-/**
- * @author Erik Khalimov.
- */
 public interface BookingPeriodDao {
 
     void save(BookingPeriod bookingPeriod);

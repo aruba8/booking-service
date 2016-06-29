@@ -4,9 +4,6 @@ import ca.erik.bs.model.Landlord;
 
 import java.util.List;
 
-/**
- * @author Erik Khalimov.
- */
 public interface LandlordDao {
 
     Landlord get(int key);

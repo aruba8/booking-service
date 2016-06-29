@@ -3,9 +3,6 @@ package ca.erik.bs.dao;
 import java.sql.Connection;
 import java.sql.SQLException;
 
-/**
- * @author Erik Khalimov.
- */
 public interface DaoFactory {
     Connection getConnection() throws SQLException;
 
