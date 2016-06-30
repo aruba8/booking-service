@@ -1,6 +1,7 @@
 package ca.erik.bs.dao.impl;
 
 import ca.erik.bs.dao.BookingPeriodDao;
+import ca.erik.bs.dao.exception.DatabaseException;
 import ca.erik.bs.model.BookingPeriod;
 
 import java.sql.Connection;
@@ -24,7 +25,7 @@ public class BookingPeriodDaoImpl extends BaseDao implements BookingPeriodDao {
         super(connection);
     }
 
-    public void save(BookingPeriod bookingPeriod) {
+    public void save(BookingPeriod bookingPeriod) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(SAVE_QUERY);
@@ -33,13 +34,13 @@ public class BookingPeriodDaoImpl extends BaseDao implements BookingPeriodDao {
             pstm.setDate(2, bookingPeriod.getToDate());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public void update(BookingPeriod bookingPeriod) {
+    public void update(BookingPeriod bookingPeriod) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(UPDATE_QUERY);
@@ -49,13 +50,13 @@ public class BookingPeriodDaoImpl extends BaseDao implements BookingPeriodDao {
             pstm.setInt(4, bookingPeriod.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public List<BookingPeriod> findByApartmentId(int apartmentId) {
+    public List<BookingPeriod> findByApartmentId(int apartmentId) throws DatabaseException {
         List<BookingPeriod> bookingPeriodList = new ArrayList<BookingPeriod>();
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -72,7 +73,7 @@ public class BookingPeriodDaoImpl extends BaseDao implements BookingPeriodDao {
                 bookingPeriodList.add(bookingPeriod);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(rs, pstm);
         }
@@ -80,13 +81,13 @@ public class BookingPeriodDaoImpl extends BaseDao implements BookingPeriodDao {
 
     }
 
-    public void deleteAll() {
+    public void deleteAll() throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(DELETE_ALL_QUERY);
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }

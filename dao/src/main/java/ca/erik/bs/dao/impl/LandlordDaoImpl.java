@@ -1,6 +1,7 @@
 package ca.erik.bs.dao.impl;
 
 import ca.erik.bs.dao.LandlordDao;
+import ca.erik.bs.dao.exception.DatabaseException;
 import ca.erik.bs.model.Landlord;
 
 import java.sql.Connection;
@@ -30,7 +31,7 @@ public class LandlordDaoImpl extends BaseDao implements LandlordDao {
         super(connection);
     }
 
-    public Landlord get(int key) {
+    public Landlord get(int key) throws DatabaseException {
         PreparedStatement pstm = null;
         ResultSet rs = null;
         Landlord landlord = new Landlord();
@@ -48,14 +49,14 @@ public class LandlordDaoImpl extends BaseDao implements LandlordDao {
             landlord.setPhoneNumber(rs.getString("phone_number"));
             landlord.setEmail(rs.getString("email"));
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(rs, pstm);
         }
         return landlord;
     }
 
-    public Landlord findLandlordByEmail(String email) {
+    public Landlord findLandlordByEmail(String email) throws DatabaseException {
         PreparedStatement pstm = null;
         ResultSet rs = null;
         Landlord landlord = new Landlord();
@@ -71,14 +72,14 @@ public class LandlordDaoImpl extends BaseDao implements LandlordDao {
             landlord.setPhoneNumber(rs.getString("phone_number"));
             landlord.setEmail(rs.getString("email"));
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(rs, pstm);
         }
         return landlord;
     }
 
-    public void save(Landlord landLord) {
+    public void save(Landlord landLord) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(SAVE_QUERY);
@@ -89,13 +90,13 @@ public class LandlordDaoImpl extends BaseDao implements LandlordDao {
             pstm.setString(5, landLord.getEmail());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public void update(Landlord landLord) {
+    public void update(Landlord landLord) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(UPDATE_QUERY);
@@ -107,38 +108,38 @@ public class LandlordDaoImpl extends BaseDao implements LandlordDao {
             pstm.setInt(6, landLord.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public void delete(Landlord landLord) {
+    public void delete(Landlord landLord) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(DELETE_QUERY);
             pstm.setInt(1, landLord.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public void deleteAll() {
+    public void deleteAll() throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = connection.prepareStatement(DELETE_ALL_QUERY);
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public List<Landlord> findAll() {
+    public List<Landlord> findAll() throws DatabaseException {
         PreparedStatement pstm = null;
         ResultSet rs = null;
         List<Landlord> landlordList = new ArrayList<Landlord>();
@@ -156,7 +157,7 @@ public class LandlordDaoImpl extends BaseDao implements LandlordDao {
                 landlordList.add(landlord);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(rs, pstm);
         }

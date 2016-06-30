@@ -1,6 +1,7 @@
 package ca.erik.bs.dao.impl;
 
 import ca.erik.bs.dao.TransactionDao;
+import ca.erik.bs.dao.exception.DatabaseException;
 import ca.erik.bs.model.Transaction;
 
 import java.sql.*;
@@ -26,7 +27,7 @@ public class TransactionDaoImpl extends BaseDao implements TransactionDao {
         super(connection);
     }
 
-    public void save(Transaction transaction) {
+    public void save(Transaction transaction) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(SAVE_QUERY);
@@ -38,13 +39,13 @@ public class TransactionDaoImpl extends BaseDao implements TransactionDao {
             pstm.executeUpdate();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public Transaction get(int key) {
+    public Transaction get(int key) throws DatabaseException {
         Transaction transaction = new Transaction();
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -60,14 +61,14 @@ public class TransactionDaoImpl extends BaseDao implements TransactionDao {
             transaction.setTenantId(rs.getInt("tenant_id"));
             transaction.setTransactionTime(rs.getTimestamp("transaction_time"));
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(rs, pstm);
         }
         return transaction;
     }
 
-    public void update(Transaction transaction) {
+    public void update(Transaction transaction) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(UPDATE_QUERY);
@@ -79,38 +80,38 @@ public class TransactionDaoImpl extends BaseDao implements TransactionDao {
             pstm.setInt(6, transaction.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public void delete(Transaction transaction) {
+    public void delete(Transaction transaction) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(DELETE_QUERY);
             pstm.setInt(1, transaction.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public void deleteAll() {
+    public void deleteAll() throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(DELETE_ALL_QUERY);
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public List<Transaction> findByTenantId(int tenantId) {
+    public List<Transaction> findByTenantId(int tenantId) throws DatabaseException {
         Transaction transaction = new Transaction();
         List<Transaction> transactionList = new ArrayList<Transaction>();
         PreparedStatement pstm = null;
@@ -129,7 +130,7 @@ public class TransactionDaoImpl extends BaseDao implements TransactionDao {
                 transactionList.add(transaction);
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(rs, pstm);
         }

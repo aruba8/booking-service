@@ -1,6 +1,7 @@
 package ca.erik.bs.dao.impl;
 
 import ca.erik.bs.dao.TenantDao;
+import ca.erik.bs.dao.exception.DatabaseException;
 import ca.erik.bs.model.Tenant;
 
 import java.sql.Connection;
@@ -26,7 +27,7 @@ public class TenantDaoImpl extends BaseDao implements TenantDao {
         super(connection);
     }
 
-    public Tenant get(int key) {
+    public Tenant get(int key) throws DatabaseException {
         Tenant tenant = new Tenant();
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -44,14 +45,14 @@ public class TenantDaoImpl extends BaseDao implements TenantDao {
             tenant.setPhoneNumber(rs.getString("phone_number"));
             tenant.setEmail(rs.getString("email"));
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(rs, pstm);
         }
         return tenant;
     }
 
-    public void save(Tenant tenant) {
+    public void save(Tenant tenant) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(SAVE_QUERY);
@@ -62,13 +63,13 @@ public class TenantDaoImpl extends BaseDao implements TenantDao {
             pstm.setString(5, tenant.getEmail());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
     }
 
-    public void update(Tenant tenant) {
+    public void update(Tenant tenant) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = this.connection.prepareStatement(UPDATE_QUERY);
@@ -80,21 +81,21 @@ public class TenantDaoImpl extends BaseDao implements TenantDao {
             pstm.setInt(6, tenant.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
 
     }
 
-    public void delete(Tenant tenant) {
+    public void delete(Tenant tenant) throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = connection.prepareStatement(DELETE_QUERY);
             pstm.setInt(1, tenant.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
@@ -102,20 +103,20 @@ public class TenantDaoImpl extends BaseDao implements TenantDao {
 
     }
 
-    public void deleteAll() {
+    public void deleteAll() throws DatabaseException {
         PreparedStatement pstm = null;
         try {
             pstm = connection.prepareStatement(DELETE_ALL_QUERY);
             pstm.executeUpdate();
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(null, pstm);
         }
 
     }
 
-    public Tenant findByEmail(String email) {
+    public Tenant findByEmail(String email) throws DatabaseException {
         Tenant tenant = new Tenant();
         PreparedStatement pstm = null;
         ResultSet rs = null;
@@ -133,7 +134,7 @@ public class TenantDaoImpl extends BaseDao implements TenantDao {
             tenant.setPhoneNumber(rs.getString("phone_number"));
             tenant.setEmail(rs.getString("email"));
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new DatabaseException(e);
         } finally {
             closeResources(rs, pstm);
         }
