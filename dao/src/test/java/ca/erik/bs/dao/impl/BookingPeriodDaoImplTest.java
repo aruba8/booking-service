@@ -4,6 +4,7 @@ import ca.erik.bs.dao.ApartmentDao;
 import ca.erik.bs.dao.BookingPeriodDao;
 import ca.erik.bs.dao.LandlordDao;
 import ca.erik.bs.dao.PostgresDaoFactory;
+import ca.erik.bs.dao.exception.DatabaseException;
 import ca.erik.bs.dao.util.PropertiesManager;
 import ca.erik.bs.model.Apartment;
 import ca.erik.bs.model.BookingPeriod;
@@ -83,7 +84,7 @@ public class BookingPeriodDaoImplTest extends BaseTest {
 
     }
 
-    private Landlord createAndReturnLandlord() {
+    private Landlord createAndReturnLandlord() throws DatabaseException {
         Landlord landlord = new Landlord();
         landlord.setFirstName("test");
         landlord.setLastName("test");
@@ -94,7 +95,7 @@ public class BookingPeriodDaoImplTest extends BaseTest {
         return landlordDao.findLandlordByEmail("test@test.ca");
     }
 
-    private Apartment createAndReturnApartment(Landlord landlord) {
+    private Apartment createAndReturnApartment(Landlord landlord) throws DatabaseException {
         Apartment apartment = new Apartment();
         apartment.setAddress("123 main str");
         apartment.setPrice(234d);

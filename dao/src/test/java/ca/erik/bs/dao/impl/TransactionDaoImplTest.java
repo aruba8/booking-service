@@ -1,6 +1,7 @@
 package ca.erik.bs.dao.impl;
 
 import ca.erik.bs.dao.*;
+import ca.erik.bs.dao.exception.DatabaseException;
 import ca.erik.bs.dao.util.PropertiesManager;
 import ca.erik.bs.model.*;
 import org.junit.After;
@@ -52,7 +53,7 @@ public class TransactionDaoImplTest extends BaseTest {
         return bookingPeriodDao.findByApartmentId(apartment.getId()).get(0);
     }
 
-    private Apartment createAndReturnApartment(Landlord landlord) {
+    private Apartment createAndReturnApartment(Landlord landlord) throws DatabaseException {
         Apartment apartment = new Apartment();
         apartment.setPrice(234d);
         apartment.setAddress("123 main str");
@@ -61,7 +62,7 @@ public class TransactionDaoImplTest extends BaseTest {
         return apartmentDao.findByLandlordId(landlord.getId()).get(0);
     }
 
-    private Landlord createAndReturnLandlord() {
+    private Landlord createAndReturnLandlord() throws DatabaseException {
         Landlord landlord = new Landlord();
         landlord.setFirstName("test");
         landlord.setMiddleName("test");
@@ -72,7 +73,7 @@ public class TransactionDaoImplTest extends BaseTest {
         return landlordDao.findLandlordByEmail("test@test.ca");
     }
 
-    private Tenant createAndReturnTenant() {
+    private Tenant createAndReturnTenant() throws DatabaseException {
         Tenant tenant = new Tenant();
         tenant.setMiddleName("test");
         tenant.setFirstName("test");
