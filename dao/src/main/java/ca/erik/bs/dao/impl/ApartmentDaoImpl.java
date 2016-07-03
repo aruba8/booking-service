@@ -41,7 +41,7 @@ public class ApartmentDaoImpl extends BaseDao implements ApartmentDao {
             pstm.setInt(3, apartment.getLandlordId());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            throw new DatabaseException(e);
+            throw new DatabaseException("Exception on saving apartment");
         } finally {
             closeResources(null, pstm);
         }
@@ -64,7 +64,7 @@ public class ApartmentDaoImpl extends BaseDao implements ApartmentDao {
                 apartment.setId(rs.getInt("landlord_id"));
             }
         } catch (SQLException e) {
-            throw new DatabaseException(e);
+            throw new DatabaseException("Exception on getting apartment by id");
         } finally {
             closeResources(rs, pstm);
         }
@@ -88,7 +88,7 @@ public class ApartmentDaoImpl extends BaseDao implements ApartmentDao {
                 apartmentList.add(apartment);
             }
         } catch (SQLException e) {
-            throw new DatabaseException(e);
+            throw new DatabaseException("Exception on find apartments by landlordId");
         } finally {
             closeResources(rs, pstm);
         }
@@ -106,7 +106,7 @@ public class ApartmentDaoImpl extends BaseDao implements ApartmentDao {
             pstm.setInt(4, apartment.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            throw new DatabaseException(e);
+            throw new DatabaseException("Exception on updating apartment");
         } finally {
             closeResources(null, pstm);
         }
@@ -119,7 +119,7 @@ public class ApartmentDaoImpl extends BaseDao implements ApartmentDao {
             pstm.setInt(1, apartment.getId());
             pstm.executeUpdate();
         } catch (SQLException e) {
-            throw new DatabaseException(e);
+            throw new DatabaseException("Exception on delete apartment");
         } finally {
             closeResources(null, pstm);
         }
@@ -131,7 +131,7 @@ public class ApartmentDaoImpl extends BaseDao implements ApartmentDao {
             pstm = connection.prepareStatement(DELETE_ALL_QUERY);
             pstm.executeUpdate();
         } catch (SQLException e) {
-            throw new DatabaseException(e);
+            throw new DatabaseException("Exception on delete all apartments");
         } finally {
             closeResources(null, pstm);
         }
@@ -153,7 +153,7 @@ public class ApartmentDaoImpl extends BaseDao implements ApartmentDao {
                 apartmentList.add(apartment);
             }
         } catch (SQLException e) {
-            throw new DatabaseException(e);
+            throw new DatabaseException("Exception on getting all apartments");
         } finally {
             closeResources(rs, pstm);
         }
