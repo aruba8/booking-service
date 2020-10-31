@@ -2,48 +2,72 @@ package ca.erik.bs.dao.impl;
 
 import ca.erik.bs.dao.*;
 import ca.erik.bs.dao.exception.DatabaseException;
-import ca.erik.bs.dao.util.PropertiesManager;
 import ca.erik.bs.model.*;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
-public class TransactionDaoImplTest extends BaseTest {
+public class TransactionDaoImplTest {
 
-    private Connection connection;
-    private ApartmentDao apartmentDao;
-    private BookingPeriodDao bookingPeriodDao;
-    private LandlordDao landlordDao;
-    private TenantDao tenantDao;
-    private TransactionDao transactionDao;
-    private Tenant tenantTest;
-    private Apartment apartmentTest;
-    private BookingPeriod bookingPeriodTest;
+    private static Connection connection;
+    private static ApartmentDao apartmentDao;
+    private static BookingPeriodDao bookingPeriodDao;
+    private static LandlordDao landlordDao;
+    private static TenantDao tenantDao;
+    private static TransactionDao transactionDao;
+    private static Tenant tenantTest;
+    private static Apartment apartmentTest;
+    private static BookingPeriod bookingPeriodTest;
 
-    @Before
-    public void setUp() throws Exception {
-        PropertiesManager propertiesManager = new PropertiesManager("src/test/resources/testconfig.properties");
-        PostgresDaoFactory daoFactory = new PostgresDaoFactory(propertiesManager);
+    @ClassRule
+    public static PostgreSQLContainer<?> psql = new PostgreSQLContainer<>("postgres:10.14");
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        psql.start();
+        PostgresDaoFactory daoFactory = new PostgresDaoFactory(psql.getHost(), psql.getFirstMappedPort(),
+                psql.getUsername(), psql.getPassword(), psql.getDatabaseName());
         connection = daoFactory.getConnection();
+        String sql = BaseTest.readFile("src/test/resources/createdb.sql");
+        Statement statement = connection.createStatement();
+        statement.execute(sql);
+
         apartmentDao = daoFactory.getApartmentDao(connection);
         bookingPeriodDao = daoFactory.getBookingPeriodDao(connection);
         landlordDao = daoFactory.getLandlordDao(connection);
         tenantDao = daoFactory.getTenantDao(connection);
         transactionDao = daoFactory.getTransactionDao(connection);
+
+    }
+
+    @AfterClass
+    public static void close() throws Exception {
+        connection.close();
+    }
+
+    @Before
+    public void createData() throws Exception {
         tenantTest = createAndReturnTenant();
         Landlord landlordTest = createAndReturnLandlord();
         apartmentTest = createAndReturnApartment(landlordTest);
         bookingPeriodTest = createAndReturnBookingPeriod(apartmentTest);
-
     }
 
-    private BookingPeriod createAndReturnBookingPeriod(Apartment apartment) throws Exception {
+    @After
+    public void tearDown() throws Exception {
+        transactionDao.deleteAll();
+        bookingPeriodDao.deleteAll();
+        apartmentDao.deleteAll();
+        landlordDao.deleteAll();
+        tenantDao.deleteAll();
+    }
+
+    private static BookingPeriod createAndReturnBookingPeriod(Apartment apartment) throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         BookingPeriod bookingPeriod = new BookingPeriod();
         bookingPeriod.setApartment_id(apartment.getId());
@@ -53,7 +77,7 @@ public class TransactionDaoImplTest extends BaseTest {
         return bookingPeriodDao.findByApartmentId(apartment.getId()).get(0);
     }
 
-    private Apartment createAndReturnApartment(Landlord landlord) throws DatabaseException {
+    private static Apartment createAndReturnApartment(Landlord landlord) throws DatabaseException {
         Apartment apartment = new Apartment();
         apartment.setPrice(234d);
         apartment.setAddress("123 main str");
@@ -62,7 +86,7 @@ public class TransactionDaoImplTest extends BaseTest {
         return apartmentDao.findByLandlordId(landlord.getId()).get(0);
     }
 
-    private Landlord createAndReturnLandlord() throws DatabaseException {
+    private static Landlord createAndReturnLandlord() throws DatabaseException {
         Landlord landlord = new Landlord();
         landlord.setFirstName("test");
         landlord.setMiddleName("test");
@@ -73,7 +97,7 @@ public class TransactionDaoImplTest extends BaseTest {
         return landlordDao.findLandlordByEmail("test@test.ca");
     }
 
-    private Tenant createAndReturnTenant() throws DatabaseException {
+    private static Tenant createAndReturnTenant() throws DatabaseException {
         Tenant tenant = new Tenant();
         tenant.setMiddleName("test");
         tenant.setFirstName("test");
@@ -82,16 +106,6 @@ public class TransactionDaoImplTest extends BaseTest {
         tenant.setEmail("test@test.ca");
         tenantDao.save(tenant);
         return tenantDao.findByEmail("test@test.ca");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        transactionDao.deleteAll();
-        bookingPeriodDao.deleteAll();
-        apartmentDao.deleteAll();
-        landlordDao.deleteAll();
-        tenantDao.deleteAll();
-        connection.close();
     }
 
     @Test
