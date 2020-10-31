@@ -36,6 +36,18 @@ public class PostgresDaoFactory implements DaoFactory {
         }
     }
 
+    public PostgresDaoFactory(String host, Integer port, String user, String password, String databaseName) {
+        try {
+            this.url = String.format("jdbc:postgresql://%s:%d/%s?TC_DAEMON=true", host, port, databaseName);
+            this.user = user;
+            this.password = password;
+            this.driver = "org.postgresql.Driver";
+            Class.forName(this.driver);
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
     private void initProperties() {
         this.user = propertiesManager.properties.getProperty("db.user");
         this.password = propertiesManager.properties.getProperty("db.password");

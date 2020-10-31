@@ -9,34 +9,64 @@ import ca.erik.bs.dao.util.PropertiesManager;
 import ca.erik.bs.model.Apartment;
 import ca.erik.bs.model.BookingPeriod;
 import ca.erik.bs.model.Landlord;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.sql.Connection;
 import java.sql.Date;
+import java.sql.Statement;
 import java.text.SimpleDateFormat;
 
-public class BookingPeriodDaoImplTest extends BaseTest {
+public class BookingPeriodDaoImplTest {
 
-    private Connection connection;
-    private ApartmentDao apartmentDao;
-    private BookingPeriodDao bookingPeriodDao;
-    private LandlordDao landlordDao;
-    private Apartment apartmentTest;
-    private Landlord landlordTest;
+    private static Connection connection;
+    private static ApartmentDao apartmentDao;
+    private static BookingPeriodDao bookingPeriodDao;
+    private static LandlordDao landlordDao;
+    private static Apartment apartmentTest;
+    private static Landlord testLandlord;
 
-    @Before
-    public void setUp() throws Exception {
-        PropertiesManager propertiesManager = new PropertiesManager("src/test/resources/testconfig.properties");
-        PostgresDaoFactory daoFactory = new PostgresDaoFactory(propertiesManager);
+    @ClassRule
+    public static PostgreSQLContainer<?> psql = new PostgreSQLContainer<>("postgres:10.14");
+
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        psql.start();
+        String postgresHost = psql.getHost();
+        Integer postgresPort = psql.getFirstMappedPort();
+        String userName = psql.getUsername();
+        String password = psql.getPassword();
+        String databaseName = psql.getDatabaseName();
+        PostgresDaoFactory daoFactory = new PostgresDaoFactory(postgresHost, postgresPort, userName, password, databaseName);
+
         connection = daoFactory.getConnection();
+        String sql = BaseTest.readFile("src/test/resources/createdb.sql");
+        Statement statement = connection.createStatement();
+        statement.execute(sql);
         apartmentDao = daoFactory.getApartmentDao(connection);
         bookingPeriodDao = daoFactory.getBookingPeriodDao(connection);
         landlordDao = daoFactory.getLandlordDao(connection);
-        landlordTest = createAndReturnLandlord();
-        apartmentTest = createAndReturnApartment(landlordTest);
+
+    }
+
+    @AfterClass
+    public static void close() throws Exception{
+        connection.close();
+    }
+
+    @Before
+    public void createData() throws Exception{
+        Landlord landlord = new Landlord();
+        landlord.setFirstName("test");
+        landlord.setLastName("test");
+        landlord.setMiddleName("test");
+        landlord.setPhoneNumber("test");
+        landlord.setEmail("test@test.ca");
+        landlordDao.save(landlord);
+        testLandlord = landlordDao.findLandlordByEmail("test@test.ca");
+        testLandlord = createAndReturnLandlord();
+        apartmentTest = createAndReturnApartment(testLandlord);
     }
 
     @After
@@ -44,7 +74,6 @@ public class BookingPeriodDaoImplTest extends BaseTest {
         bookingPeriodDao.deleteAll();
         apartmentDao.deleteAll();
         landlordDao.deleteAll();
-        connection.close();
     }
 
     @Test
@@ -84,7 +113,7 @@ public class BookingPeriodDaoImplTest extends BaseTest {
 
     }
 
-    private Landlord createAndReturnLandlord() throws DatabaseException {
+    private static Landlord createAndReturnLandlord() throws DatabaseException {
         Landlord landlord = new Landlord();
         landlord.setFirstName("test");
         landlord.setLastName("test");
@@ -95,7 +124,7 @@ public class BookingPeriodDaoImplTest extends BaseTest {
         return landlordDao.findLandlordByEmail("test@test.ca");
     }
 
-    private Apartment createAndReturnApartment(Landlord landlord) throws DatabaseException {
+    private static Apartment createAndReturnApartment(Landlord landlord) throws DatabaseException {
         Apartment apartment = new Apartment();
         apartment.setAddress("123 main str");
         apartment.setPrice(234d);

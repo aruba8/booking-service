@@ -3,34 +3,46 @@ package ca.erik.bs.dao.impl;
 import ca.erik.bs.dao.ApartmentDao;
 import ca.erik.bs.dao.LandlordDao;
 import ca.erik.bs.dao.PostgresDaoFactory;
-import ca.erik.bs.dao.util.PropertiesManager;
 import ca.erik.bs.model.Apartment;
 import ca.erik.bs.model.Landlord;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.sql.Connection;
+import java.sql.Statement;
 import java.util.List;
 
 
-public class ApartmentDaoImplTest extends BaseTest {
+public class ApartmentDaoImplTest {
 
+    private static Connection connection;
+    private static ApartmentDao apartmentDao;
+    private static LandlordDao landlordDao;
+    private static Landlord testLandlord;
 
-    private Connection connection;
-    private ApartmentDao apartmentDao;
-    private LandlordDao landlordDao;
-    private Landlord testLandlord;
+    @ClassRule
+    public static PostgreSQLContainer<?> psql = new PostgreSQLContainer<>("postgres:10.14");
 
+    @BeforeClass
+    public static void setUp() throws Exception {
+        psql.start();
+        String postgresHost = psql.getHost();
+        Integer postgresPort = psql.getFirstMappedPort();
+        String userName = psql.getUsername();
+        String password = psql.getPassword();
+        String databaseName = psql.getDatabaseName();
+        PostgresDaoFactory daoFactory = new PostgresDaoFactory(postgresHost, postgresPort, userName, password, databaseName);
 
-    @Before
-    public void setUp() throws Exception {
-        PropertiesManager propertiesManager = new PropertiesManager("src/test/resources/testconfig.properties");
-        PostgresDaoFactory daoFactory = new PostgresDaoFactory(propertiesManager);
         connection = daoFactory.getConnection();
+        String sql = BaseTest.readFile("src/test/resources/createdb.sql");
+        Statement statement = connection.createStatement();
+        statement.execute(sql);
         apartmentDao = daoFactory.getApartmentDao(connection);
         landlordDao = daoFactory.getLandlordDao(connection);
+    }
+
+    @Before
+    public void createDb() throws Exception {
         Landlord landlord = new Landlord();
         landlord.setFirstName("test");
         landlord.setLastName("test");
@@ -42,9 +54,13 @@ public class ApartmentDaoImplTest extends BaseTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void dropDb() throws Exception {
         apartmentDao.deleteAll();
         landlordDao.delete(testLandlord);
+    }
+
+    @AfterClass
+    public static void tearDown() throws Exception {
         connection.close();
     }
 
@@ -74,7 +90,6 @@ public class ApartmentDaoImplTest extends BaseTest {
         Apartment foundApartment = apartmentDao.get(savedApartment.getId());
         Assert.assertEquals("444 main str", foundApartment.getAddress());
         Assert.assertEquals(222d, foundApartment.getPrice(), 0);
-
     }
 
     @Test
@@ -119,8 +134,12 @@ public class ApartmentDaoImplTest extends BaseTest {
         apartment2.setAddress("111 main str");
         apartment2.setPrice(222d);
         apartment2.setLandlordId(testLandlord.getId());
-        apartmentDao.save(apartment);
-        apartmentDao.save(apartment2);
+        try {
+            apartmentDao.save(apartment);
+            apartmentDao.save(apartment2);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         List<Apartment> apartments = apartmentDao.getAll();
         Assert.assertEquals(2, apartments.size());
     }
