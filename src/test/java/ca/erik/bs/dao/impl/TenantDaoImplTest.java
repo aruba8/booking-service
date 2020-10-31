@@ -2,33 +2,41 @@ package ca.erik.bs.dao.impl;
 
 import ca.erik.bs.dao.PostgresDaoFactory;
 import ca.erik.bs.dao.TenantDao;
-import ca.erik.bs.dao.util.PropertiesManager;
 import ca.erik.bs.model.Tenant;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.sql.Connection;
+import java.sql.Statement;
 
-public class TenantDaoImplTest extends BaseTest {
+public class TenantDaoImplTest {
 
-    private Connection connection;
-    private TenantDao tenantDao;
+    private static Connection connection;
+    private static TenantDao tenantDao;
 
-    @Before
-    public void setUp() throws Exception {
-        PropertiesManager propertiesManager = new PropertiesManager("src/test/resources/testconfig.properties");
-        PostgresDaoFactory daoFactory = new PostgresDaoFactory(propertiesManager);
+    @ClassRule
+    public static PostgreSQLContainer<?> psql = new PostgreSQLContainer<>("postgres:10.14");
+
+    @BeforeClass
+    public static void setUp() throws Exception {
+        psql.start();
+        PostgresDaoFactory daoFactory = new PostgresDaoFactory(psql.getHost(), psql.getFirstMappedPort(),
+                psql.getUsername(), psql.getPassword(), psql.getDatabaseName());
         connection = daoFactory.getConnection();
+        String sql = BaseTest.readFile("src/test/resources/createdb.sql");
+        Statement statement = connection.createStatement();
+        statement.execute(sql);
         tenantDao = daoFactory.getTenantDao(connection);
     }
 
     @After
     public void tearDown() throws Exception {
         tenantDao.deleteAll();
-        connection.close();
+    }
 
+    @AfterClass
+    public static void close() throws Exception {
+        connection.close();
     }
 
     @Test
@@ -69,7 +77,6 @@ public class TenantDaoImplTest extends BaseTest {
         Assert.assertEquals(tenant.getLastName(), savedTenant.getLastName());
         Assert.assertEquals(tenant.getMiddleName(), savedTenant.getMiddleName());
         Assert.assertEquals(tenant.getPhoneNumber(), savedTenant.getPhoneNumber());
-
     }
 
     @Test
@@ -88,8 +95,6 @@ public class TenantDaoImplTest extends BaseTest {
 
         Tenant foundTenant = tenantDao.get(savedTenant.getId());
         Assert.assertEquals("new@email.ca", foundTenant.getEmail());
-
-
     }
 
     @Test
@@ -106,8 +111,6 @@ public class TenantDaoImplTest extends BaseTest {
         tenantDao.delete(savedTenant);
 
         Tenant foundTenant = tenantDao.findByEmail("test@test.ca");
-        Assert.assertEquals(null, foundTenant);
-
+        Assert.assertNull(foundTenant);
     }
-
 }
