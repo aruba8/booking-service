@@ -29,7 +29,7 @@ public class LandlordDaoImplTest {
         String databaseName = psql.getDatabaseName();
         PostgresDaoFactory daoFactory = new PostgresDaoFactory(postgresHost, postgresPort, userName, password, databaseName);
         connection = daoFactory.getConnection();
-        String sql = BaseTest.readFile("src/test/resources/createdb.sql");
+        String sql = UtilHelper.readFile("src/test/resources/createdb.sql");
         Statement statement = connection.createStatement();
         statement.execute(sql);
         landlordDao = daoFactory.getLandlordDao(connection);

@@ -23,7 +23,7 @@ public class TenantDaoImplTest {
         PostgresDaoFactory daoFactory = new PostgresDaoFactory(psql.getHost(), psql.getFirstMappedPort(),
                 psql.getUsername(), psql.getPassword(), psql.getDatabaseName());
         connection = daoFactory.getConnection();
-        String sql = BaseTest.readFile("src/test/resources/createdb.sql");
+        String sql = UtilHelper.readFile("src/test/resources/createdb.sql");
         Statement statement = connection.createStatement();
         statement.execute(sql);
         tenantDao = daoFactory.getTenantDao(connection);

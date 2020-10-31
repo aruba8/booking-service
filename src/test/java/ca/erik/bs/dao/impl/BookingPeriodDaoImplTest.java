@@ -5,7 +5,6 @@ import ca.erik.bs.dao.BookingPeriodDao;
 import ca.erik.bs.dao.LandlordDao;
 import ca.erik.bs.dao.PostgresDaoFactory;
 import ca.erik.bs.dao.exception.DatabaseException;
-import ca.erik.bs.dao.util.PropertiesManager;
 import ca.erik.bs.model.Apartment;
 import ca.erik.bs.model.BookingPeriod;
 import ca.erik.bs.model.Landlord;
@@ -41,7 +40,7 @@ public class BookingPeriodDaoImplTest {
         PostgresDaoFactory daoFactory = new PostgresDaoFactory(postgresHost, postgresPort, userName, password, databaseName);
 
         connection = daoFactory.getConnection();
-        String sql = BaseTest.readFile("src/test/resources/createdb.sql");
+        String sql = UtilHelper.readFile("src/test/resources/createdb.sql");
         Statement statement = connection.createStatement();
         statement.execute(sql);
         apartmentDao = daoFactory.getApartmentDao(connection);
