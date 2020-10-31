@@ -2,34 +2,46 @@ package ca.erik.bs.dao.impl;
 
 import ca.erik.bs.dao.LandlordDao;
 import ca.erik.bs.dao.PostgresDaoFactory;
-import ca.erik.bs.dao.util.PropertiesManager;
 import ca.erik.bs.model.Landlord;
-import org.junit.After;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.sql.Connection;
+import java.sql.Statement;
 import java.util.List;
 
-public class LandlordDaoImplTest extends BaseTest {
+public class LandlordDaoImplTest {
 
-    private Connection connection;
-    private LandlordDao landlordDao;
-    private Landlord testLandlord;
+    private static Connection connection;
+    private static LandlordDao landlordDao;
+
+    @ClassRule
+    public static PostgreSQLContainer<?> psql = new PostgreSQLContainer<>("postgres:10.14");
 
 
-    @Before
-    public void setUp() throws Exception {
-        PropertiesManager propertiesManager = new PropertiesManager("src/test/resources/testconfig.properties");
-        PostgresDaoFactory daoFactory = new PostgresDaoFactory(propertiesManager);
+    @BeforeClass
+    public static void setUp() throws Exception {
+        psql.start();
+        String postgresHost = psql.getHost();
+        Integer postgresPort = psql.getFirstMappedPort();
+        String userName = psql.getUsername();
+        String password = psql.getPassword();
+        String databaseName = psql.getDatabaseName();
+        PostgresDaoFactory daoFactory = new PostgresDaoFactory(postgresHost, postgresPort, userName, password, databaseName);
         connection = daoFactory.getConnection();
+        String sql = BaseTest.readFile("src/test/resources/createdb.sql");
+        Statement statement = connection.createStatement();
+        statement.execute(sql);
         landlordDao = daoFactory.getLandlordDao(connection);
     }
 
     @After
     public void tearDown() throws Exception {
         landlordDao.deleteAll();
+    }
+
+    @AfterClass
+    public static void close() throws Exception {
         connection.close();
     }
 
